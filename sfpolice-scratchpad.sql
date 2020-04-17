@@ -1,3 +1,13 @@
+-- load data
+\COPY police FROM police.csv CSV HEADER;
+\COPY weather FROM weather.csv CSV HEADER;
+\COPY info FROM 311.csv CSV HEADER;
+
+-- clean data
+awk -F, '{split($7,a,"/"); $7=a[1]"-"a[2]"-"a[3]}1' OFS=,  Weather_SFO.csv
+awk -F, '{split($2,a,"/"); $2=a[1]"-"a[2]"-"a[3]}1' OFS=,  Police_Department_Incident_Reports__2018_to_Present.csv 
+
+
 SELECT incident_category,
        count (police.incident_category) as num_incidents
 FROM weather 
@@ -31,11 +41,6 @@ INNER JOIN police ON police.incident_date = weather.weather_date
 WHERE weather.temp_max > 15.0
 GROUP BY police.incident_category
 ORDER BY weather.weather_date;
-
-awk -F, '{split($7,a,"/"); $7=a[1]"-"a[2]"-"a[3]}1' OFS=,  Weather_SFO.csv
-awk -F, '{split($2,a,"/"); $2=a[1]"-"a[2]"-"a[3]}1' OFS=,  Police_Department_Incident_Reports__2018_to_Present.csv 
-
-\COPY police from police.csv CSV HEADER;
 
 SELECT
     time_bucket_gapfill('1 day', weather_date) AS date,

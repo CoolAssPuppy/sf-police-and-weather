@@ -37,7 +37,12 @@ CREATE TABLE "police"(
     control_9 NUMERIC,
     control_10 NUMERIC
 );
+SELECT create_hypertable('police', 'incident_datetime', 'incident_category', 2, create_default_indexes=>FALSE);
+SELECT create_hypertable('police', 'incident_datetime', 'incident_sub_category', 2, create_default_indexes=>FALSE);
+CREATE INDEX ON police (incident_datetime, incident_category desc);
+CREATE INDEX ON police (incident_datetime, incident_sub_category desc);
 
+DROP TABLE IF EXISTS "weather";
 CREATE TABLE "weather"(
     station TEXT,
     name TEXT,
@@ -50,9 +55,29 @@ CREATE TABLE "weather"(
     temp_min NUMERIC,
     temp_mid NUMERIC
 );
+SELECT create_hypertable('weather', 'weather_date', 'temp_mid', 2, create_default_indexes=>FALSE);
+CREATE INDEX ON weather (weather_date, temp_id desc);
 
-DROP EXTENSION IF EXISTS timescaledb;
-CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
-
-SELECT create_hypertable('police', 'incident_datetime', 'incident_category', 2, create_default_indexes=>FALSE);
-CREATE INDEX ON police (incident_datetime, incident_category desc);
+DROP TABLE IF EXISTS "info";
+CREATE TABLE "info"(
+    id TEXT,
+    open_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    close_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    update_date TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    status TEXT,
+    status_notes TEXT,
+    responsible_agency TEXT,
+    category TEXT,
+    request_type TEXT,
+    request_details TEXT,
+    street TEXT,
+    district NUMERIC,
+    neighborhood TEXT,
+    police_district TEXT,
+    latitude NUMERIC,
+    longitude NUMERIC
+);
+SELECT create_hypertable('info', 'open_date', 'category', 2, create_default_indexes=>FALSE);
+SELECT create_hypertable('info', 'open_date', 'request_type', 2, create_default_indexes=>FALSE);
+CREATE INDEX ON info (open_date, category desc);
+CREATE INDEX ON info (open_date, request_type desc);
